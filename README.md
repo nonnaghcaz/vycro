@@ -1,8 +1,6 @@
 Vycro
 =====
 
-[![Build Status]]
-
 `vycro` is a Python wrapper designed to make calling VBA functions and subroutines with Microsoft Excel as easy as a couple of standard file I/O calls.
 
 ``` python
@@ -16,6 +14,3 @@ with mw.open_workbook("/full/path/with.extension", **wb_kwargs):
 ```
 
 `vycro` currently supports Python 2.7 and Python 3.1-3.5, and requires pywin32-219.
-
-  [Build Status]: https://travis-ci.org/gannon93/vycro.png?branch=develop
-  [![Build Status]]: https://travis-ci.org/gannon93/vycro

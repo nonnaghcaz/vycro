@@ -3,7 +3,6 @@
 from __future__ import absolute_import, print_function, division
 try:
     from setuptools import setup, find_packages
-    from setuptools.command import easy_install
     from setuptools.command.test import test as TestCommand
 except ImportError:
     raise RuntimeError('No suitable version of setuptools detected.')
@@ -11,21 +10,9 @@ import re
 import os
 import codecs
 import sys
-import struct
-
-try:
-    import pip
-except ImportError:
-    pip = None
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 # sys.path.insert(0, os.path.join(HERE, 'vycro'))
-
-FEDEX_LINKS = (
-    '\\\\fxg\\dfs\\SHARED\\GROUNDCOMM\\Gannon'
-    '\\GPS Navigation\\Garmin\\Reporting\\deps'
-)
-DEPENDENCY_LINKS = []
 
 PYVER = sys.version_info
 PYPLAT = sys.platform
@@ -50,14 +37,6 @@ class PyTest(TestCommand):
 
 ###############################################################################
 
-whl = os.path.join(FEDEX_LINKS, 'whl')
-if os.path.exists(whl):
-    DEPENDENCY_LINKS.append(whl)
-
-
-def is_python_64bit():
-    return (struct.calcsize("P") == 8)
-
 
 def read(*parts):
     with codecs.open(os.path.join(HERE, *parts), 'rb', 'utf-8') as f:
@@ -71,53 +50,9 @@ def find_meta(meta):
         r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
         META_FILE, re.M
     )
-
     if meta_match:
         return meta_match.group(1)
     raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
-
-
-def install_pywin32():
-    print('\nAttempting to install Pywin32 dependency locally...')
-    if PYPLAT is 'win32':
-        if (
-            (PYVER >= PY3_MIN and PYVER <= PY3_MAX) or
-            (PYVER >= PY2_MIN and PYVER <= PY2_MAX)
-        ):
-            (major, minor) = PYVER
-
-            if is_python_64bit():
-                pybit = 'win_amd64'
-            else:
-                pybit = 'win32'
-
-            if pip is not None:
-                dep = ''.join([
-                    'pypiwin32-219-cp', str(major), str(minor), '-none-',
-                    pybit, '.whl'
-                ])
-                pip.main([
-                    'install', os.path.join(FEDEX_LINKS, 'whl', dep)
-                ])
-            else:
-
-                dep = ''.join([
-                    'pywin32-219.', str(pybit).replace('_', '-'),
-                    '-py', str(major), '.', str(minor), '.exe'
-                ])
-                easy_install.main([
-                    '-U', os.path.join(FEDEX_LINKS, 'bin', dep)
-                ])
-        else:
-            raise RuntimeError('No suitable python version for pywin32')
-    else:
-        raise RuntimeError(
-            'No suitable OS found.'
-            'Only 32 or 64 bit versions of Microsoft Windows valid.'
-        )
-
-# if 'install' in sys.argv:
-#     install_pywin32()
 
 setup(
     name='vycro',
@@ -144,7 +79,6 @@ setup(
     ],
     install_requires=['pypiwin32'],
     include_package_data=True,
-    dependency_links=DEPENDENCY_LINKS,
     tests_require=['pytest', 'pytest-pep8', 'pytest-cov'],
     test_suite='vycro.tests.test_vycro',
     cmdclass={'test': PyTest}
